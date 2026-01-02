@@ -4,6 +4,9 @@ flask-cors
 cryptography
 requests
 beautifulsoup4
-gunicorn.
+gunicorn
+encrypt
+decrypt 
+
 
 
