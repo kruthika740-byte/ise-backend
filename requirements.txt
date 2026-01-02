@@ -1,8 +1,9 @@
+requirements.txt 
 flask
-flask-cors
+flask-cors 
+cryptography
 requests
 beautifulsoup4
-cryptography
-gunicorn
+gunicorn.
 
 
