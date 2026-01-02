@@ -1,48 +1,49 @@
-from flask import Flask, jsonify, request
+from flask import Flask, request, jsonify
 from flask_cors import CORS
+import requests  # NEW
+from bs4 import BeautifulSoup  # NEW
 
 app = Flask(__name__)
 CORS(app)
 
-# 1. LEAD HUNTER ENGINE (GET)
-@app.route('/api/leads', methods=['GET'])
-def get_leads():
-    return jsonify({
-        "results": [{"company": "TechCorp", "email": "hr@techcorp.com", "industry": "AI"}],
-        "ISE_Student": "Kruthika R"
-    })
-
-# 2. PREDICTIVE SALES ENGINE (POST)
+# 1. THE SALES PREDICTOR (Keep this)
 @app.route('/api/predict', methods=['POST'])
-def predict_sales():
-    import random
+def predict():
     data = request.json
     stock = int(data.get('stock', 0))
-    sales = int(data.get('avg_sales', 0))
-    
-    if sales > 0:
-        days_left = round((stock / sales) * (0.95 + random.random() * 0.1), 1)
-        status = "High Risk" if days_left < 7 else "Healthy"
-    else:
-        days_left, status = 0, "Invalid Data"
+    avg_sales = int(data.get('avg_sales', 1))
+    days = stock // avg_sales
+    return jsonify({
+        "days_remaining": days,
+        "status": "Critical" if days < 7 else "Healthy"
+    })
 
-    return jsonify({"days_remaining": days_left, "status": status})
-
-# 3. SECURE VAULT ENGINE (POST)
+# 2. THE SECURE VAULT (Keep this)
 @app.route('/api/vault', methods=['POST'])
-def access_vault():
+def vault():
     data = request.json
-    secret_key = data.get('key', '').lower()
-    
-    # The 'Decryption' Logic
-    if secret_key == "ise2025":
+    if data.get('key') == "ise2025":
+        return jsonify({"access": "Granted", "decrypted_message": "ISE_CONFIDENTIAL_2025"})
+    return jsonify({"access": "Denied"})
+
+# 3. THE REAL WEB SCRAPER (Update this section)
+@app.route('/api/leads', methods=['GET'])
+def get_leads():
+    try:
+        url = "https://news.ycombinator.com/show"
+        headers = {'User-Agent': 'Mozilla/5.0'}
+        response = requests.get(url, headers=headers, timeout=5)
+        soup = BeautifulSoup(response.text, 'html.parser')
+        
+        # Scrape the top trending project title
+        first_link = soup.select_one('.titleline > a')
+        project_name = first_link.text if first_link else "No live data"
+        
         return jsonify({
-            "access": "Granted",
-            "decrypted_message": "PROJECT_X: SECURE_ALPHA_v1",
-            "security": "AES-256"
+            "results": [{"company": project_name, "status": "Live from HN"}]
         })
-    return jsonify({"access": "Denied", "decrypted_message": "********"})
+    except Exception as e:
+        return jsonify({"results": [{"company": "Offline Cache", "status": "Using Mock Data"}]})
 
 if __name__ == '__main__':
     app.run(debug=True)
-
