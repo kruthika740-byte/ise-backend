@@ -1,0 +1,12 @@
+{
+  "candidate": "Kruthika R",
+  "role": "Information Science Engineer",
+  "top_skills": ["Python", "Flask", "Cybersecurity", "Web Scraping"],
+  "projects": [
+    {
+      "name": "Digital Passport",
+      "tech": "AES-256 Encryption",
+      "description": "Secure data handshake module."
+    }
+  ]
+}
